@@ -8,3 +8,5 @@ oss:
 
 font:
   path: /Users/abc/bbb/pingfangsr.ttf
+
+img_tmp_dir: tmp/image/

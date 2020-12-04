@@ -20,8 +20,6 @@ type Poster struct {
 	Background      string  `json:"background"`
 	Texts           []Text  `json:"texts"`
 	Images          []Image `json:"images"`
-	Blocks          []Block `json:"blocks"`
-	Lines           []Line  `json:"lines"`
 	SavePath        string
 	SaveName        string
 }
