@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"pokerface_poster/config"
-	"pokerface_poster/file"
 
 	"github.com/golang/freetype/truetype"
 
+	"github.com/Yeate/goposter/file"
 	"github.com/Yeate/gowheel"
 	"github.com/fogleman/gg"
 	"github.com/spf13/viper"
@@ -32,8 +31,6 @@ var ImgTempDir string
 var Font *truetype.Font
 
 func init() {
-	cfg := config.NewConfig(".", "env")
-	_ = cfg.InitConfig()
 	fontBytes, _ := ioutil.ReadFile(viper.GetString("font.path"))
 	Font, _ = truetype.Parse(fontBytes)
 

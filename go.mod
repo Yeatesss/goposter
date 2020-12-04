@@ -1,4 +1,4 @@
-module pokerface_poster
+module github.com/Yeate/goposter
 
 go 1.14
 

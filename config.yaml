@@ -1,0 +1,10 @@
+disk: "local"
+
+oss:
+  endpoint:
+  access_key_id:
+  access_key_secret:
+  bucket_name:
+
+font:
+  path: /Users/abc/bbb/pingfangsr.ttf
