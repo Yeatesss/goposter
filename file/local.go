@@ -18,6 +18,10 @@ func (l *LocalFile) PrintTest() {
 	fmt.Println("local")
 }
 func (l *LocalFile) Save(savePath, fileName string) (err error) {
+	err = gowheel.InitPath(savePath)
+	if err != nil {
+		return
+	}
 	_, err = gowheel.CopyFile(savePath+fileName, viper.GetString("img_tmp_dir")+fileName)
 	return
 

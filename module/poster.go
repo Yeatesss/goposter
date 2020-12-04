@@ -39,6 +39,7 @@ func NewPoster() *Poster {
 
 //NewPoster 初始化画布
 func (poster *Poster) NewPoster() (ins *Instantiation) {
+	_ = gowheel.InitPath(ImgTempDir)
 	ins = &Instantiation{}
 	if poster.Background != "" {
 		poster.Height, poster.Width = gowheel.GetImageSizeFromUrl(poster.Background)
