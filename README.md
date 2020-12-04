@@ -1,129 +1,97 @@
 # goposter
 海报生成器
+### 目前支持
+* 图片
+* 文字
 
-* 
+### 准备工作
+* 1. 拉取代码包进项目
+* 2. 创建海报包的配置文件,配置文件支持yaml 路径例如：/home/admin/abc.yaml 
 
-## 安装
-```bash
-git clone https://github.com/qbhy/poster-generater.git
-cd poster-generater
+```
+#配置文件
+disk: "local" #海报存放方式 local:本地磁盘 oss:阿里云OSS
 
-# 如果对代码做了改动，则需要重新编译
-go build
+oss:          #阿里云OSS配置项
+  endpoint:
+  access_key_id:
+  access_key_secret:
+  bucket_name:
+  
+img_tmp_dir: tmp/image/ #临时文件存放地址
+
 ```
 
-## 启动
-```bash
-./poster-generater-linux 7877
-# mac 请使用 ./poster-generater-mac 7877
-# windows 环境请自行编译
+* 3. 代码入口中进行配置文件初始化
+
+```
+cfg := config.NewConfig("/home/admin", "abc")
+_ = cfg.InitConfig()
 ```
 
-## 使用
-```http request
-POST /poster HTTP/1.1
-Host: 118.24.77.48:7876
-Content-Type: application/json
-cache-control: no-cache
-Postman-Token: eb879967-e34b-4144-b4fb-1dd90961e155
-{
-    "width": 640,
-    "height": 1034,
-    "backgroundColor": "#d04c44",
-    "blocks": [
-        {
-            "x": 25,
-            "y": 25,
-            "width": 590,
-            "height": 820,
-            "borderColor": "#ffe6c0",
-            "borderWidth": 2
-        },
-        {
-            "x": 0,
-            "y": 870,
-            "width": 640,
-            "height": 164,
-            "backgroundColor": "#fff"
-        },
-        {
-            "x": 67,
-            "y": 303,
-            "width": 506,
-            "height": 500,
-            "backgroundColor": "#fff"
-        }
-    ],
-    "texts": [
-        {
-            "text": "桥边红药",
-            "x": 320,
-            "y": 187,
-            "fontSize": 18,
-            "lineHeight": 18,
-            "color": "#ffe6c0",
-            "width": 320,
-            "lineNum": 1,
-            "baseLine": "middle",
-            "textAlign": "center"
-        },
-        {
-            "text": "这个人很懒~",
-            "x": 320,
-            "y": 225,
-            "fontSize": 20,
-            "lineHeight": 24,
-            "color": "#ffe6c0",
-            "width": 480,
-            "lineNum": 2,
-            "baseLine": "middle",
-            "textAlign": "center"
-        },
-        {
-            "text": "微信内长按图片识别小程序来「 抽奖助手 」看看吧",
-            "x": 170,
-            "y": 923,
-            "fontSize": 18,
-            "color": "#999",
-            "width": 300,
-            "lineNum": 2,
-            "baseLine": "middle",
-            "zIndex": 8,
-            "lineHeight": 40
-        }
-    ],
-    "images": [
-        {
-            "url": "https://i.loli.net/2018/12/18/5c186d195b3b9.png",
-            "x": 270,
-            "y": 67,
-            "width": 100,
-            "height": 100,
-            "borderRadius": 100
-        },
-        {
-            "url": "https://i.loli.net/2018/12/18/5c185a49b48ee.png",
-            "x": 87,
-            "y": 323,
-            "width": 466,
-            "height": 460
-        },
-        {
-            "url": "https://services.janguly.com/wx-app/code?aid=photo&page=/pages/me/me",
-            "x": 45,
-            "y": 905,
-            "width": 100,
-            "height": 100,
-            "zIndex": 9
-        }
-    ],
-    "lines": []
-}------WebKitFormBoundary7MA4YWxkTrZu0gW--
+### 生成海报代码样例
+
+
 ```
-> `http://118.24.77.48:7876` 是我个人服务器地址，为了方便大家测试效果，开放给大家使用，切勿在生产环境使用。
+//初始化配置文件
+cfg := config.NewConfig("/Users/abc/coding/aaa", "config")
+_ = cfg.InitConfig()
+//创建海报实例
+poster := module.NewPoster()
+//加载字体文件
+pinfang, _ := os.Open("/Users/aaa/coding/bbb/pingfangsr.ttf")
+//设置海报地址
+poster.Background = "http://img.aiimg.com/uploads/allimg/180707/1-1PFG64119.jpg"
+//设置最终海报输出路径
+poster.SavePath = "images/"
+poster.SaveName = "test_poster.png"
+//海报额外附着图
+poster.Images = append(poster.Images, module.Image{Url: "http://n.sinaimg.cn/sinacn16/580/w690h690/20180414/0939-fzcyxmu4864171.jpg", X: 327, Y: 175, Width: 227, Height: 227})
+//海报文字
+text := module.Text{Color: "#080808", Text: "测试海报", X: 334, Y: 653, FontSize: 50}
+//设置字体
+text.SetFont(pinfang)
+poster.Texts = append(poster.Texts, text)
+err := poster.Draw()
+```
+![](https://gitee.com/ye3245/oss/raw/master/uPic/test_poster.jpg)
+###结构体解析
+####海报
 
-上面这个例子生成的海报如下:  
-![谷粒相册](https://i.loli.net/2018/12/18/5c18a61aa88ee.png)
+| 字段名             | 类型      | 备注                     |
+|-----------------|---------|------------------------|
+| Width           | float64 | 宽（当Background不为空的时候失效） |
+| Height          | float64 | 高（当Background不为空的时候失效） |
+| BackgroundColor | string  | 背景色（存在背景图时候会被覆盖）       |
+| Background      | string  | 背景图                    |
+| Texts           | []Text  | 插入的文字集合                |
+| Images          | []Image | 插入的图片集合                |
+| SavePath        | string  | 海报保存路径                 |
+| SaveName        | string  | 保存的文件名                 |
+
+####文字
+| 字段名             | 类型      | 备注                     |
+|-----------------|---------|------------------------|
+| X           |int | 横坐标 左上原点 |
+| Y          |int | 纵坐标 左上原点 |
+| Text |string  | 文字       |
+| Width      |float64  | 宽度                   |
+| FontSize           |int  | 字体大小                |
+| Color          |string | 字体颜色               |
+| LineHeight        |int  | 行高                 |
+| TextAlign        |string  | 文字对齐方式                 |
 
 
-96qbhy@gmail.com
+####图片
+| 字段名             | 类型      | 备注                     |
+|-----------------|---------|------------------------|
+| X           |int | 横坐标 左上原点 |
+| Y          |int | 纵坐标 左上原点 |
+| Url |string  | 图片网络地址       |
+| Width      |float64  | 宽度，不填写原始大小                   |
+| Height           |int  | 高度    ，不填写原始大小           |
+
+
+
+
+
