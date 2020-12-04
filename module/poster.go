@@ -43,7 +43,7 @@ func (poster *Poster) NewPoster() (ins *Instantiation) {
 	ins = &Instantiation{}
 	if poster.Background != "" {
 		poster.Height, poster.Width = gowheel.GetImageSizeFromUrl(poster.Background)
-		poster.Images = append([]Image{{0, 0, poster.Background, int(poster.Width), int(poster.Height), 0}}, poster.Images...)
+		poster.Images = append([]Image{{0, 0, poster.Background, int(poster.Width), int(poster.Height), 0, false}}, poster.Images...)
 	}
 	ins.Background = gg.NewContext(int(poster.Width), int(poster.Height))
 	ins.Background.SetHexColor(poster.BackgroundColor)

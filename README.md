@@ -46,7 +46,7 @@ poster.Background = "http://img.aiimg.com/uploads/allimg/180707/1-1PFG64119.jpg"
 poster.SavePath = "images/"
 poster.SaveName = "test_poster.png"
 //海报额外附着图
-poster.Images = append(poster.Images, module.Image{Url: "http://n.sinaimg.cn/sinacn16/580/w690h690/20180414/0939-fzcyxmu4864171.jpg", X: 327, Y: 175, Width: 227, Height: 227})
+poster.Images = append(poster.Images, module.Image{Url: "http://n.sinaimg.cn/sinacn16/580/w690h690/20180414/0939-fzcyxmu4864171.jpg", X: 327, Y: 175, Width: 227, Height: 227，CircleClip:false})
 //海报文字
 text := module.Text{Color: "#080808", Text: "测试海报", X: 334, Y: 653, FontSize: 50}
 //设置字体
@@ -55,6 +55,7 @@ poster.Texts = append(poster.Texts, text)
 err := poster.Draw()
 ```
 ![](https://gitee.com/ye3245/oss/raw/master/uPic/test_poster.jpg)
+
 ###结构体解析
 ####海报
 
@@ -90,6 +91,7 @@ err := poster.Draw()
 | Url |string  | 图片网络地址       |
 | Width      |float64  | 宽度，不填写原始大小                   |
 | Height           |int  | 高度    ，不填写原始大小           |
+| CircleClip           |bool  |图片切成圆形 true:切 false:不切           |
 
 
 

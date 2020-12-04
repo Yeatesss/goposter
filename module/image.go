@@ -1,6 +1,8 @@
 package module
 
 import (
+	"image"
+	"math"
 	"os"
 
 	"github.com/Yeate/gowheel"
@@ -11,12 +13,13 @@ import (
 )
 
 type Image struct {
-	X            int    `json:"x"`
-	Y            int    `json:"y"`
-	Url          string `json:"url"`
-	Width        int    `json:"width"`
-	Height       int    `json:"height"`
-	BorderRadius int    `json:"borderRadius"`
+	X            int     `json:"x"`
+	Y            int     `json:"y"`
+	Url          string  `json:"url"`
+	Width        int     `json:"width"`
+	Height       int     `json:"height"`
+	BorderRadius float64 `json:"border_radius"`
+	CircleClip   bool    `json:"circle_clip"`
 }
 
 func (img *Image) Draw(dc *gg.Context) error {
@@ -39,13 +42,32 @@ func (img *Image) Draw(dc *gg.Context) error {
 	}
 
 	if imgInstance, err := gg.LoadImage(imgPath); err == nil {
-		img.CheckWh()
-		imgInstance = resize.Resize(uint(img.Width), uint(img.Height), imgInstance, resize.Lanczos3)
+		if img.CircleClip {
+			imgInstance = img.CircleClipAction(imgInstance)
+		} else {
+			img.CheckWh()
+			imgInstance = resize.Resize(uint(img.Width), uint(img.Height), imgInstance, resize.Lanczos3)
+		}
 		dc.DrawImage(imgInstance, img.X, img.Y)
 		return nil
 	} else {
 		return err
 	}
+}
+func (img *Image) CircleClipAction(imgInstance image.Image) image.Image {
+	w := imgInstance.Bounds().Size().X
+	h := imgInstance.Bounds().Size().Y
+
+	if img.BorderRadius == 0 {
+		img.BorderRadius = math.Min(float64(w), float64(h)) / 2
+
+	}
+	dc := gg.NewContext(int(img.BorderRadius*2), int(img.BorderRadius*2))
+
+	dc.DrawCircle(float64(w/2), float64(h/2), img.BorderRadius)
+	dc.Clip()
+	dc.DrawImage(imgInstance, 0, 0)
+	return dc.Image()
 }
 
 func (img *Image) CheckWh() {
