@@ -2,6 +2,8 @@ package module
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 
 	"golang.org/x/image/font"
 
@@ -19,9 +21,22 @@ type Text struct {
 	Color      string  `json:"color"`
 	LineHeight int     `json:"lineHeight"`
 	TextAlign  string  `json:"textAlign"`
+	Font       *font.Face
 }
 
 const TextAlignCenter = "center"
+
+func (t *Text) SetFont(reader io.Reader) {
+	fontBytes, _ := ioutil.ReadAll(reader)
+	f, _ := truetype.Parse(fontBytes)
+	if f != nil {
+		fontFace := truetype.NewFace(f, &truetype.Options{
+			Size: float64(t.FontSize),
+		})
+		t.Font = &fontFace
+
+	}
+}
 
 func (t *Text) DrawX(w float64) float64 {
 	if t.TextAlign == TextAlignCenter {
@@ -31,17 +46,14 @@ func (t *Text) DrawX(w float64) float64 {
 }
 
 func (text *Text) Draw(dc *gg.Context) error {
-	var fontFace font.Face
 	if text.LineHeight == 0 {
 		text.LineHeight = text.FontSize
 	}
-	if Font != nil {
-		fontFace = truetype.NewFace(Font, &truetype.Options{
-			Size: float64(text.FontSize),
-		})
-
+	if text.Font == nil {
+		err := fmt.Errorf("text not set font")
+		return err
 	}
-	dc.SetFontFace(fontFace)
+	dc.SetFontFace(*text.Font)
 	//dc.FontHeight()
 	////_ = dc.LoadFontFace(viper.GetString("font.path"), float64(text.FontSize))
 	dc.SetHexColor(text.Color)

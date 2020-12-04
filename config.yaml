@@ -6,7 +6,4 @@ oss:
   access_key_secret:
   bucket_name:
 
-font:
-  path: /Users/abc/bbb/pingfangsr.ttf
-
 img_tmp_dir: tmp/image/

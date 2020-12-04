@@ -2,10 +2,7 @@ package module
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-
-	"github.com/golang/freetype/truetype"
 
 	"github.com/Yeate/goposter/file"
 	"github.com/Yeate/gowheel"
@@ -26,13 +23,12 @@ type Poster struct {
 
 var FileSystem file.FileSystem
 var ImgTempDir string
-var Font *truetype.Font
 
-func init() {
-	fontBytes, _ := ioutil.ReadFile(viper.GetString("font.path"))
-	Font, _ = truetype.Parse(fontBytes)
-
-}
+//func init() {
+//	fontBytes, _ := ioutil.ReadFile(viper.GetString("font.path"))
+//	Font, _ = truetype.Parse(fontBytes)
+//
+//}
 
 func NewPoster() *Poster {
 	viper.SetDefault("img_tmp_dir", "tmp/image/")
@@ -59,10 +55,6 @@ func (poster *Poster) Draw() (err error) {
 	if poster.SavePath == "" {
 		err = fmt.Errorf("save_path is null")
 		return
-	}
-	if exists, _ := gowheel.PathExists(viper.GetString("font.path")); !exists {
-		err := fmt.Errorf("font file not found")
-		return err
 	}
 	//初始画布，设置背景
 	ins := poster.NewPoster()
