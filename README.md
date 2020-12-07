@@ -3,6 +3,7 @@
 ### 目前支持
 * 图片
 * 文字
+* 横线
 
 ### 准备工作
 * 1. 拉取代码包进项目
@@ -52,6 +53,8 @@ text := module.Text{Color: "#080808", Text: "测试海报", X: 334, Y: 653, Font
 //设置字体
 text.SetFont(pinfang)
 poster.Texts = append(poster.Texts, text)
+poster.Lines = append(poster.Lines, module.Line{StartX: 0, StartY: 0, EndX: 199, EndY: 50, Width: 2, Color: "#000000"})
+
 err := poster.Draw()
 ```
 ![](https://gitee.com/ye3245/oss/raw/master/uPic/test_poster.jpg)
@@ -69,6 +72,17 @@ err := poster.Draw()
 | Images          | []Image | 插入的图片集合                |
 | SavePath        | string  | 海报保存路径                 |
 | SaveName        | string  | 保存的文件名                 |
+
+####横线
+
+| 字段名             | 类型      | 备注                     |
+|-----------------|---------|------------------------|
+| StartX           | float64 | 起始横坐标 |
+| StartY          | float64 | 起始纵坐标 |
+| EndX | float64  | 结束横坐标       |
+| EndY      | float64  | 结束纵坐标                    |
+| Width           | int  | 线的粗细                |
+| Color          | string | 线的颜色                |
 
 ####文字
 | 字段名             | 类型      | 备注                     |

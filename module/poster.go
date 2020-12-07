@@ -17,6 +17,7 @@ type Poster struct {
 	Background      string  `json:"background"`
 	Texts           []Text  `json:"texts"`
 	Images          []Image `json:"images"`
+	Lines           []Line  `json:"lines"`
 	SavePath        string
 	SaveName        string
 }
@@ -72,7 +73,12 @@ func (poster *Poster) Draw() (err error) {
 			return
 		}
 	}
-
+	for _, drawable := range poster.Lines {
+		err = ins.draw(&drawable)
+		if err != nil {
+			return
+		}
+	}
 	//保存图片
 	err = ins.save(poster.SavePath, poster.SaveName)
 
