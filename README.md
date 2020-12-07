@@ -6,7 +6,7 @@
 * 横线
 
 ### 准备工作
-* 1. 拉取代码包进项目
+* 1. 拉取代码包进项目 go get github.com/Yeate/goposter@v0.1.1
 * 2. 创建海报包的配置文件,配置文件支持yaml 路径例如：/home/admin/abc.yaml 
 
 ```
