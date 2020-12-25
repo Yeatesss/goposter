@@ -1,7 +1,11 @@
 package module
 
 import (
+	"bytes"
 	"fmt"
+	"image"
+	"io"
+	"io/ioutil"
 	"os"
 
 	"github.com/Yeate/goposter/file"
@@ -11,13 +15,13 @@ import (
 )
 
 type Poster struct {
-	Width           float64 `json:"width"`
-	Height          float64 `json:"height"`
-	BackgroundColor string  `json:"backgroundColor"`
-	Background      string  `json:"background"`
-	Texts           []Text  `json:"texts"`
-	Images          []Image `json:"images"`
-	Lines           []Line  `json:"lines"`
+	Width           float64     `json:"width"`
+	Height          float64     `json:"height"`
+	BackgroundColor string      `json:"backgroundColor"`
+	Background      interface{} `json:"background"`
+	Texts           []Text      `json:"texts"`
+	Images          []Image     `json:"images"`
+	Lines           []Line      `json:"lines"`
 	SavePath        string
 	SaveName        string
 }
@@ -42,9 +46,29 @@ func NewPoster() *Poster {
 func (poster *Poster) NewPoster() (ins *Instantiation) {
 	_ = gowheel.InitPath(ImgTempDir)
 	ins = &Instantiation{}
-	if poster.Background != "" {
-		poster.Height, poster.Width = gowheel.GetImageSizeFromUrl(poster.Background)
-		poster.Images = append([]Image{{0, 0, poster.Background, int(poster.Width), int(poster.Height), 0, false}}, poster.Images...)
+	if poster.Background != nil {
+		switch v := poster.Background.(type) {
+		case string:
+			background := v
+			poster.Height, poster.Width = gowheel.GetImageSizeFromUrl(background)
+			poster.Images = append([]Image{{X: 0, Y: 0, Url: background, Width: int(poster.Width), Height: int(poster.Height)}}, poster.Images...)
+		case io.Reader:
+
+			bs, _ := ioutil.ReadAll(v)
+			ins, _, _ := image.Decode(bytes.NewBuffer(bs))
+			g := ins.Bounds()
+			height := float64(g.Dy())
+			width := float64(g.Dx())
+			if poster.Width == 0 {
+				poster.Width = width
+			}
+			if poster.Height == 0 {
+				poster.Height = height
+			}
+			poster.Images = append([]Image{{X: 0, Y: 0, ImgData: bytes.NewBuffer(bs), Width: int(poster.Width), Height: int(poster.Height)}}, poster.Images...)
+
+		}
+
 	}
 	ins.Background = gg.NewContext(int(poster.Width), int(poster.Height))
 	ins.Background.SetHexColor(poster.BackgroundColor)
@@ -102,55 +126,11 @@ func (ins *Instantiation) save(path, name string) (err error) {
 	defer func() {
 		_ = os.Remove(ImgTempDir + name)
 	}()
+	err = gowheel.InitPath(ImgTempDir)
+
 	err = ins.Background.SavePNG(ImgTempDir + name)
 	if err == nil {
 		err = FileSystem.Save(path, name)
-
 	}
 	return
 }
-
-//
-//func (poster *Poster) initQueue() {
-//	var queue DrawQueue
-//	sort := []int{}
-//
-//	if poster.queue == nil {
-//		queue = make(DrawQueue)
-//	} else {
-//		queue = poster.queue
-//	}
-//
-//	for _, drawable := range poster.Images {
-//		queue, sort = appendToQueue(queue, drawable, sort)
-//	}
-//
-//	for _, drawable := range poster.Lines {
-//		queue, sort = appendToQueue(queue, drawable, sort)
-//	}
-//
-//	for _, drawable := range poster.Blocks {
-//		queue, sort = appendToQueue(queue, drawable, sort)
-//	}
-//
-//	for _, drawable := range poster.Texts {
-//		queue, sort = appendToQueue(queue, drawable, sort)
-//	}
-//
-//	poster.sort = sort
-//	//utils2.QuickSort(poster.sort)
-//	poster.queue = queue
-//}
-//
-//func appendToQueue(queue DrawQueue, drawable Drawable, sort []int) (DrawQueue, []int) {
-//	index := drawable.GetZIndex()
-//	value, exists := queue[index]
-//	if exists {
-//		queue[index] = append(value, drawable)
-//	} else {
-//		sort = append(sort, index)
-//		queue[index] = []Drawable{drawable}
-//	}
-//
-//	return queue, sort
-//}
