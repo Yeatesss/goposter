@@ -1,6 +1,7 @@
 package file
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"sync"
@@ -10,7 +11,8 @@ import (
 )
 
 var (
-	o    *OssFile
+	o *OssFile
+
 	lock sync.Mutex
 )
 
@@ -54,7 +56,7 @@ func (o *OssFile) Save(savePath, fileName string) (err error) {
 		return
 	}
 	src, _ := os.Open(viper.GetString("img_tmp_dir") + fileName)
-	err = bucket.PutObject(savePath+fileName, src)
+	err = bucket.PutObject(savePath+fileName, bufio.NewReader(src), oss.ContentLength(453529))
 	if err != nil {
 		return err
 	}
